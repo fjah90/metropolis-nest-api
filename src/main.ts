@@ -11,6 +11,7 @@ async function bootstrap() {
   app.setGlobalPrefix('v1');
 
   const config = new DocumentBuilder()
+  .addBearerAuth()
   .setTitle('metropolis-api')
   .setDescription('')
   .setVersion('1.0')
