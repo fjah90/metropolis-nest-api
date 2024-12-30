@@ -13,7 +13,7 @@ export class ReportsController {
     response.setHeader('Content-Type', 'application/pdf');
     response.setHeader('Content-Disposition', 'inline; filename="Bill-Prueba.pdf"');
 
-    pdfDoc.pipe(response);
-    pdfDoc.end();
+   // pdfDoc.pipe(response);
+   // pdfDoc.end();
   }
 }
