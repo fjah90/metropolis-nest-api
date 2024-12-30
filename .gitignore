@@ -1,4 +1,5 @@
 # compiled output
+/certificates
 /dist
 /node_modules
 /build
