@@ -11,7 +11,8 @@ export class PdfSigningController {
   async createAndSignPdf(@Body() body: { content: string }, @Res() response: Response) {
     // Definir el contenido del PDF
     const docDefinition: TDocumentDefinitions = {
-      content: [body.content], // El contenido dinámico de la solicitud
+      content: [body.content,],
+       // El contenido dinámico de la solicitud
     };
 
     // Firmamos el PDF
