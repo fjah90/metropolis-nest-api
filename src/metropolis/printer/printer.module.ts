@@ -3,6 +3,6 @@ import { PrinterService } from './printer.service';
 
 @Module({
   providers: [PrinterService],
-  exports: [ PrinterService ]
+  exports: [PrinterService]
 })
-export class PrinterModule {}
+export class PrinterModule { }
