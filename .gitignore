@@ -1,5 +1,5 @@
 # compiled output
-/.ssh
+/certificates
 /dist
 /node_modules
 /build
@@ -56,8 +56,5 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
-
-#PDF Generados
-*.pdf
 
 .env

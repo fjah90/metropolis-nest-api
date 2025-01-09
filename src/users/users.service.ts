@@ -11,20 +11,20 @@ export class UsersService {
     {
       userId: 1,
       username: 'john',
-      password: 'changeme'
-    },
-    {
-      userId: 2,
-      username: 'maria',
-      password: 'guess'
-    }
-  ];
-
-  async findOne(username: string): Promise<User | undefined> {
-    const user = this.users.find(user => user.username === username);
-    console.log('User found in findOne:', user); // Log para verificar si el usuario fue encontrado
-    return user;
+      password:'changeme'
+  },
+  {
+    userId: 2,
+    username: 'maria',
+    password:'guess'
   }
+];
+
+async findOne(username: string): Promise<User | undefined> {
+  const user = this.users.find(user => user.username === username);
+  console.log('User found in findOne:', user); // Log para verificar si el usuario fue encontrado
+  return user;
+}
 
   create(createUserDto: CreateUserDto) {
     return 'This action adds a new user';
@@ -33,6 +33,8 @@ export class UsersService {
   findAll() {
     return `This action returns all users`;
   }
+
+
 
   update(id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;

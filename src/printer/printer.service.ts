@@ -5,10 +5,10 @@ import * as fse from 'fs-extra'; // Para leer archivos de certificado
 
 const fonts = {
   Roboto: {
-    normal: 'public/fonts/Roboto-Regular.ttf',
-    bold: 'public/fonts/Roboto-Medium.ttf',
-    italics: 'public/fonts/Roboto-Italic.ttf',
-    bolditalics: 'public/fonts/Roboto-MediumItalic.ttf',
+    normal: 'fonts/Roboto-Regular.ttf',
+    bold: 'fonts/Roboto-Medium.ttf',
+    italics: 'fonts/Roboto-Italic.ttf',
+    bolditalics: 'fonts/Roboto-MediumItalic.ttf',
   },
 };
 
