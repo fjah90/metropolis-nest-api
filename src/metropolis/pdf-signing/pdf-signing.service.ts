@@ -141,7 +141,7 @@ export class PdfSigningService {
 
     const pdf = await fse.readFile(fullPath);
     const pdfSigner = await this.prepareSigner();
-    const parameters = await this.getSignatureParameters(50, 700, 'right');
+    const parameters = await this.getSignatureParameters(50, 750, 'right');
 
     // Añadir formulario vacío y firmar
     const pdfWithForm = await this.addEmptyAcroForm(pdf);

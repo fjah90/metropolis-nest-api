@@ -9,6 +9,7 @@ import { PdfSigningService } from './metropolis/pdf-signing/pdf-signing.service'
 import { PdfSigningController } from './metropolis/pdf-signing/pdf-signing.controller';
 import { FacturaModule } from './metropolis/factura/factura.module';
 import { MulterModule } from '@nestjs/platform-express';
+import { ReportsModule } from './metropolis/reports/reports.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MulterModule } from '@nestjs/platform-express';
     UsersModule,
     PrinterModule,
     FacturaModule,
+    ReportsModule,
   ],
   controllers: [AppController, PdfSigningController],
   providers: [AppService, PdfSigningService],
