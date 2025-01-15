@@ -68,7 +68,7 @@ export class FacturaService {
                                         idioma: invoice.InvoiceIssueData.LanguageName,
                                     },
                                 },
-                                impuestos:{
+                                impuestos: {
                                     tipoImpuesto: tax.TaxTypeCode,
                                     tasaImpuesto: parseFloat(tax.TaxRate),
                                     baseImponible: tax.TaxableBase.TotalAmount,
@@ -91,7 +91,7 @@ export class FacturaService {
                                     cuentaDestino: paymentDetails.AccountToBeCredited?.IBAN,
                                 },
                                 datosAdicionales: invoice.AdditionalData.InvoiceAdditionalInformation,
-                                items:{
+                                items: {
                                     referenciaTransaccion: items.IssuerTransactionReference,
                                     descripcionItem: items.ItemDescription,
                                     cantidad: items.Quantity,

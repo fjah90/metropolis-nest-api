@@ -2,7 +2,7 @@ import { TDocumentDefinitions, Content } from 'pdfmake/interfaces';
 
 // Logo de la empresa
 const logo: Content = {
-  image: 'public/assets/prueba.png',
+  image: 'public/assets/logo-metropolis-oficial.png',
   width: 120,
   alignment: 'left',
 };

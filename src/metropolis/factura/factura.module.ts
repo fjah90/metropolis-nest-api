@@ -7,4 +7,4 @@ import { FacturaController } from './factura.controller';
   providers: [FacturaService],
   exports: [FacturaService]
 })
-export class FacturaModule {}
+export class FacturaModule { }
