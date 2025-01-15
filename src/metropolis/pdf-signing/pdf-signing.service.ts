@@ -5,25 +5,40 @@ import moment from 'moment';
 import path from 'path';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { PdfDigitalSigner, SignerSettings, SignDigitalParameters } from 'sign-pdf-lib';
-import { PrinterService } from 'src/metropolis/printer/printer.service';
+import { PrinterService } from '../printer/printer.service';
 
 @Injectable()
 export class PdfSigningService {
+  private invoiceCounter: number;
+
   constructor(
     private readonly printerService: PrinterService,
     private readonly configService: ConfigService, // Para variables de entorno
-  ) { }
+  ) {
+    this.invoiceCounter = 0;
+    this.loadInvoiceCounter();
+  }
+
+  private async loadInvoiceCounter() {
+    const counterFilePath = path.resolve(process.cwd(), 'public', 'invoice-counter.json');
+    if (await fse.pathExists(counterFilePath)) {
+      const data = await fse.readJson(counterFilePath);
+      this.invoiceCounter = data.counter;
+    } else {
+      this.invoiceCounter = 0;
+    }
+  }
+
+  private async incrementInvoiceCounter() {
+    this.invoiceCounter += 1;
+    const counterFilePath = path.resolve(process.cwd(), 'public', 'invoice-counter.json');
+    await fse.writeJson(counterFilePath, { counter: this.invoiceCounter });
+  }
 
   private async prepareSigner(): Promise<PdfDigitalSigner> {
     try {
-      // Ajustamos las rutas de los certificados y claves privadas
       const certificatePath = path.resolve(process.cwd(), '.ssh/certificate.pem');
       const privateKeyPath = path.resolve(process.cwd(), '.ssh/private_decrypted.key');
-
-      console.log('Ruta del certificado:', certificatePath);
-      console.log('Ruta de la clave privada:', privateKeyPath);
-
-
 
       if (!(await fse.pathExists(certificatePath))) {
         throw new Error(`El archivo de certificado no existe: ${certificatePath}`);
@@ -99,7 +114,7 @@ export class PdfSigningService {
             lines: [
               'Digitally signed by',
               'JOHN DOE',
-              'Date: 2023.11.03',
+              `Date: ${moment().format('YYYY-MM-DD')}`,
               '20:28:46 +02\'00\'',
             ],
           },
@@ -108,14 +123,18 @@ export class PdfSigningService {
     };
   }
 
-  async signPdf(docDefinition: TDocumentDefinitions): Promise<Buffer> {
+  async signPdf(docDefinition: TDocumentDefinitions): Promise<{ fileName: string, url: string }> {
+    await this.incrementInvoiceCounter();
+    const invoiceNumber = this.invoiceCounter.toString().padStart(4, '0');
+
+    const timestamp = moment().format('YYYY-MM-DD');
+    const uniqueFilename = `factura-N-${invoiceNumber}_${timestamp}.pdf`;
+
     const outputPath = path.resolve(process.cwd(), 'public/output');
     if (!(await fse.pathExists(outputPath))) {
       await fse.mkdirp(outputPath);
     }
 
-    const timestamp = moment().format('YYYY-MM-DD_HH-mm-ss');
-    const uniqueFilename = `signed-pdf-${timestamp}.pdf`;
     const fullPath = path.resolve(outputPath, uniqueFilename);
 
     // Crear PDF
@@ -132,8 +151,6 @@ export class PdfSigningService {
       pdfDoc.end();
     });
 
-    console.log(`PDF generado en: ${fullPath}`);
-
     // Validar PDF
     if (!(await fse.pathExists(fullPath))) {
       throw new Error(`El archivo PDF no se generó correctamente: ${fullPath}`);
@@ -145,25 +162,18 @@ export class PdfSigningService {
 
     // Añadir formulario vacío y firmar
     const pdfWithForm = await this.addEmptyAcroForm(pdf);
-    console.log('Formulario AcroForm añadido al PDF.');
-
     const signedPdf = await pdfSigner.signAsync(pdfWithForm, parameters);
 
-    const signedPdfFilename = `signed-pdf-${timestamp}.pdf`;
+    const signedPdfFilename = `${uniqueFilename}`;
     const signedPdfPath = path.resolve(outputPath, signedPdfFilename);
     await fse.writeFile(signedPdfPath, signedPdf);
 
-    console.log(`PDF firmado guardado: ${signedPdfPath}`);
-
     const baseUrl = process.env.BASE_URL || 'http://localhost:3000/public';
-    const relativeUrl = `/output/${signedPdfFilename}`;
+    const relativeUrl = `/public/output/${signedPdfFilename}`;
     const fullUrl = new URL(relativeUrl, baseUrl).toString();
 
-    const response = { url: fullUrl, message: "PDF Generado!" };
-
-    return signedPdf;
+    return { fileName: signedPdfFilename, url: fullUrl };
   }
-
 
   private async addEmptyAcroForm(pdf: Buffer): Promise<Buffer> {
     const { PDFDocument } = require('pdf-lib');

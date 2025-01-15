@@ -16,19 +16,22 @@ export class ReportsService {
               private readonly pdfSigningService: PdfSigningService
   ) {}
 
-  async getBillReport(): Promise <Buffer> {
+  async getBillReport(): Promise <{fileName: string, url: string}> {
     const docDefinition: TDocumentDefinitions = billReport();
+    
 
      // Genera el PDF
      const pdfDoc = await this.printer.createPdf(docDefinition);
 
      // Firma el PDF
-     const signedPdf = await this.pdfSigningService.signPdf(docDefinition);
- 
-     return signedPdf; // Retorna el PDF firmado
+     const { fileName, url } = await this.pdfSigningService.signPdf(docDefinition); 
+     
+     return { fileName, url };
+    
+    }
 
 
-
-  }
 
 }
+
+

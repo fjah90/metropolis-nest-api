@@ -10,6 +10,9 @@ import { PdfSigningController } from './metropolis/pdf-signing/pdf-signing.contr
 import { FacturaModule } from './metropolis/factura/factura.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { ReportsModule } from './metropolis/reports/reports.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+
 
 @Module({
   imports: [
@@ -17,11 +20,16 @@ import { ReportsModule } from './metropolis/reports/reports.module';
       dest: './uploads', // Directorio donde se guardarán los archivos temporalmente
       }),
     ConfigModule.forRoot({ isGlobal:true }), //Esto configura para que las variables de entorno esten disponibles para cualquier parte del codigo
+    ServeStaticModule.forRoot({ 
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/public',
+     }), // Opcional: para acceder a través de '/public/output' }),
     AuthModule,
     UsersModule,
     PrinterModule,
     FacturaModule,
     ReportsModule,
+    
   ],
   controllers: [AppController, PdfSigningController],
   providers: [AppService, PdfSigningService],

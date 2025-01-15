@@ -27,6 +27,7 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.4.15",
+    "@nestjs/serve-static": "^2.2.2",
     "@nestjs/swagger": "^8.1.0",
     "@types/pdfmake": "^0.2.10",
     "bcrypt": "^5.1.1",
@@ -42,6 +43,7 @@
     "redis": "^4.7.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
+    "serve-static": "^1.16.2",
     "sign-pdf-lib": "^2.0.3",
     "uuid": "^11.0.5",
     "xml2js": "^0.6.2"
