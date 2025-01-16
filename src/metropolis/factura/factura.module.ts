@@ -5,6 +5,6 @@ import { FacturaController } from './factura.controller';
 @Module({
   controllers: [FacturaController],
   providers: [FacturaService],
-  exports: [FacturaService]
+  exports: [FacturaService],
 })
 export class FacturaModule { }

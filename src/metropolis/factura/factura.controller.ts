@@ -7,7 +7,7 @@ import { FacturaService } from './factura.service';
 @Controller('facturas')
 export class FacturaController {
     constructor(private readonly facturaService: FacturaService) { }
-    @Post()
+    @Post('conver-to-json')
     @UseInterceptors(FileInterceptor('file'))
     @ApiBody({ type: 'form-data' })
     @ApiResponse({ status: 200, type: FacturaDto })
@@ -15,4 +15,14 @@ export class FacturaController {
         const xmlData = file.buffer.toString('utf-8');
         return this.facturaService.convertirXmlAJson(xmlData);
     }
+
+    @Post('create-and-sign-pdf')
+    @UseInterceptors(FileInterceptor('file'))
+    @ApiBody({ type: 'form-data' })
+    @ApiResponse({ status: 200, description: 'PDF generado y firmado correctamente.' })
+    async convertirXmlGetPDF(@UploadedFile() file: Express.Multer.File): Promise<{ fileName: string; url: string }> {
+        const xmlData = file.buffer.toString('utf-8');
+        return this.facturaService.convertirXmlAJsonAngGetPDF(xmlData);
+    }
+    
 }
