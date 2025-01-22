@@ -13,14 +13,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Archive {
-  id    Int   @id @unique
+model bill {
+  id    Int   @id @unique @default(autoincrement())
   name  String  @unique
-  description String?
-  file  String?
   download_url  String
-  extension  String?
-  esios_available  Boolean @default(false)
+  is_deleted Boolean @default(false)
   created_at  DateTime   @default(now())
   update_at   DateTime  @updatedAt
 }
