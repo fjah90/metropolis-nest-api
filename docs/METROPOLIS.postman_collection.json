@@ -7,7 +7,304 @@
 	},
 	"item": [
 		{
-			"name": "Metropolis",
+			"name": "metropolis",
+			"item": [
+				{
+					"name": "pdf-signing",
+					"item": [
+						{
+							"name": "api/v1/pdf-signing/create-and-sign-pdf",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"followRedirects": true,
+								"disableUrlEncoding": false,
+								"disableCookies": false
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiam9obiIsImlhdCI6MTczNTkwNzU5OCwiZXhwIjoxNzM1OTExMTk4fQ.9nAaH30o_PU8nZoa5-VT3OobeBcFEYTjLgd_mue4i8o",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "User-Agent",
+										"value": "insomnia/10.3.0"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "fileXml",
+											"type": "file",
+											"src": "/C:/Users/ferna/Downloads/FRA_MET_10200.xml"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/v1/pdf-signing/create-and-sign-pdf",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"v1",
+										"pdf-signing",
+										"create-and-sign-pdf"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "bill",
+					"item": [
+						{
+							"name": "api/v1/bill/create-and-sign-pdf",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiam9obiIsImlhdCI6MTczNjk2MDUyOCwiZXhwIjoxNzM2OTY0MTI4fQ.3QG-OkTWyX4kO2Y9YCF5xnpjv7dzQ_x9VVrSstPE4SI",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/ferna/Downloads/FRA_MET_10200.xml"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/v1/bill/create-and-sign-pdf",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"v1",
+										"bill",
+										"create-and-sign-pdf"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "api/v1/bill/conver-to-json",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiam9obiIsImlhdCI6MTczNjk2MDUyOCwiZXhwIjoxNzM2OTY0MTI4fQ.3QG-OkTWyX4kO2Y9YCF5xnpjv7dzQ_x9VVrSstPE4SI",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/ferna/Downloads/FRA_MET_10200-(4 items).xml"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/v1/bill/conver-to-json",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"v1",
+										"bill",
+										"conver-to-json"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "bill-storage",
+					"item": [
+						{
+							"name": "api/v1/bill-storage/get-bills",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:3000/api/v1/bill-storage/get-bills",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"v1",
+										"bill-storage",
+										"get-bills"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "api/v1/bill-storage/get-by-name",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"fileName\": \"factura-N-10200_21012025220535.pdf\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:3000/api/v1/bill-storage/get-by-name",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"v1",
+										"bill-storage",
+										"get-by-name"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "api/v1/bill-storage/database-delete/:id",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"fileName\": \"factura-N-10200_21012025220535.pdf\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:3000/api/v1/bill-storage/database-delete/1",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"v1",
+										"bill-storage",
+										"database-delete",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "api/v1/bill-storage/soft-delete/:id",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"fileName\": \"factura-N-10200_21012025220535.pdf\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:3000/api/v1/bill-storage/soft-delete/7",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"v1",
+										"bill-storage",
+										"soft-delete",
+										"7"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "auth",
 			"item": [
 				{
 					"name": "api/v1/auth/login",
@@ -60,73 +357,6 @@
 								"v1",
 								"auth",
 								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "api/v1/pdf-signing/create-and-sign-pdf",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"followRedirects": true,
-						"disableUrlEncoding": false,
-						"disableCookies": false
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiam9obiIsImlhdCI6MTczNTkwNzU5OCwiZXhwIjoxNzM1OTExMTk4fQ.9nAaH30o_PU8nZoa5-VT3OobeBcFEYTjLgd_mue4i8o",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "User-Agent",
-								"value": "insomnia/10.3.0"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"content\": \"Este es un PDF de prueba con firma digital.\"\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3000/api/v1/pdf-signing/create-and-sign-pdf",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"api",
-								"v1",
-								"pdf-signing",
-								"create-and-sign-pdf"
 							]
 						}
 					},
