@@ -6,33 +6,17 @@ import path from 'path';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { PdfDigitalSigner, SignerSettings, SignDigitalParameters } from 'sign-pdf-lib';
 import { PrinterService } from '../printer/printer.service';
+import { PDFDocument } from 'pdf-lib';
+import { BillStorageService } from '../bill-storage/bill-storage.service';
 
 @Injectable()
 export class PdfSigningService {
-  private invoiceCounter: number;
 
   constructor(
     private readonly printerService: PrinterService,
     private readonly configService: ConfigService, // Para variables de entorno
+    private readonly billStorageService: BillStorageService, // Para crear el archivo en base de datos
   ) {
-    this.invoiceCounter = 0;
-    this.loadInvoiceCounter();
-  }
-
-  private async loadInvoiceCounter() {
-    const counterFilePath = path.resolve(process.cwd(), 'public', 'invoice-counter.json');
-    if (await fse.pathExists(counterFilePath)) {
-      const data = await fse.readJson(counterFilePath);
-      this.invoiceCounter = data.counter;
-    } else {
-      this.invoiceCounter = 0;
-    }
-  }
-
-  private async incrementInvoiceCounter() {
-    this.invoiceCounter += 1;
-    const counterFilePath = path.resolve(process.cwd(), 'public', 'invoice-counter.json');
-    await fse.writeJson(counterFilePath, { counter: this.invoiceCounter });
   }
 
   private async prepareSigner(): Promise<PdfDigitalSigner> {
@@ -72,6 +56,7 @@ export class PdfSigningService {
     x: number,
     y: number,
     alignment: 'center' | 'left' | 'right',
+    pageNumber: number = 1
   ): Promise<SignDigitalParameters> {
     const pageWidth = 595.28;
     const pageHeight = 841.89;
@@ -93,7 +78,7 @@ export class PdfSigningService {
     const background = await fse.readFile(signatureImagePath);
 
     return {
-      pageNumber: 1,
+      pageNumber,
       signature: {
         name: 'Test Signer',
         location: 'Timisoara',
@@ -123,11 +108,8 @@ export class PdfSigningService {
     };
   }
 
-  async signPdf(docDefinition: TDocumentDefinitions): Promise<{ fileName: string, url: string }> {
-    await this.incrementInvoiceCounter();
-    const invoiceNumber = this.invoiceCounter.toString().padStart(4, '0');
-
-    const timestamp = moment().format('YYYY-MM-DD');
+  async signPdf(docDefinition: TDocumentDefinitions, invoiceNumber: any = ""): Promise<{ id: number, fileName: string, url: string }> {
+    const timestamp = moment().format('DDMMYYYYHHmmss');
     const uniqueFilename = `factura-N-${invoiceNumber}_${timestamp}.pdf`;
 
     const outputPath = path.resolve(process.cwd(), 'public/output');
@@ -158,7 +140,11 @@ export class PdfSigningService {
 
     const pdf = await fse.readFile(fullPath);
     const pdfSigner = await this.prepareSigner();
-    const parameters = await this.getSignatureParameters(50, 750, 'right');
+    const pdfRead = await PDFDocument.load(pdf);
+    const totalPages = pdfRead.getPageCount();
+
+    console.log(`El PDF tiene ${totalPages} páginas.`);
+    const parameters = await this.getSignatureParameters(50, 780, 'right', totalPages);
 
     // Añadir formulario vacío y firmar
     const pdfWithForm = await this.addEmptyAcroForm(pdf);
@@ -168,11 +154,24 @@ export class PdfSigningService {
     const signedPdfPath = path.resolve(outputPath, signedPdfFilename);
     await fse.writeFile(signedPdfPath, signedPdf);
 
-    const baseUrl = process.env.BASE_URL || 'http://localhost:3000/public';
+    // TODO: en este punto se debe subir el archivo a un servidor de almacenamiento en la nube
     const relativeUrl = `/public/output/${signedPdfFilename}`;
-    const fullUrl = new URL(relativeUrl, baseUrl).toString();
-
-    return { fileName: signedPdfFilename, url: fullUrl };
+    const baseUrl = process.env.BASE_URL || 'http://localhost:3000/public';
+    // TODO: se debe construir la url del archivo en el servidor de almacenamiento en la nube
+    // TODO: confirmar que el archivo este subido a la nube
+    const fullUrl = new URL(relativeUrl, baseUrl).toString(); //baseUrl por url del archivo en el servidor
+    try {
+      const data = await this.registerPdfInDatabase(signedPdfFilename, fullUrl);
+      if (!data) {
+        throw new Error('Error al registrar el PDF en la base de datos');
+      }
+      return { id: data.id, fileName: signedPdfFilename, url: fullUrl };
+    } catch (error) {
+      console.error('Error registrando el PDF en la base de datos:', error);
+      throw error;
+    }
+    // TODO: borrar el archivo del output
+    // await fse.unlink(fullPath);
   }
 
   private async addEmptyAcroForm(pdf: Buffer): Promise<Buffer> {
@@ -188,4 +187,26 @@ export class PdfSigningService {
 
     return await existingPdfDoc.save();
   }
+
+  //Metodo para Guardado en base de datos
+  private async registerPdfInDatabase(fileName: string, fullUrl: string,): Promise<any> {
+    try {
+      // Crear el registro en la base de datos
+      const data = await this.billStorageService.createBill({
+        name: fileName,
+        download_url: fullUrl,
+        is_deleted: false,
+      });
+      if(!data){
+        throw new Error('Error al registrar el PDF en la base de datos');
+      }
+      console.log(data);
+      console.log(`PDF registrado en la base de datos: ${data.id}`);
+      return data;
+    } catch (error) {
+      console.error('Error registrando el PDF en la base de datos:', error);
+      throw error;
+    }
+  }
+
 }
