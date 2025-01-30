@@ -1,8 +1,9 @@
-import { Controller, Post, Body, Res } from '@nestjs/common';
+import { Controller, Post, Body, Res, InternalServerErrorException, BadRequestException, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { Response } from 'express';
 import { PdfSigningService } from './pdf-signing.service';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiBearerAuth()
 @ApiTags('pdf-signing')
@@ -29,5 +30,31 @@ export class PdfSigningController {
     // console.log(signedPdfBuffer)
 
     // return signedPdfBuffer;
+  }
+
+  @Post('create-and-sign-xml')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiBody({ type: 'form-data' })
+  @ApiResponse({ status: 200, description: 'XML generado y firmado correctamente.' })
+  async createAndSignXml(@UploadedFile() file: Express.Multer.File): Promise<{ fileName: string; url: string }> {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    try {
+      // Leemos el contenido del archivo XML
+      const xmlData = file.buffer.toString();
+
+      // Firmamos el XML
+      const signedXml = await this.pdfSigningService.signXml(xmlData);
+
+      return {
+        fileName: signedXml.fileName,
+        url: signedXml.url,
+      };
+    } catch (error) {
+      console.error('Error processing file:', error);
+      throw new InternalServerErrorException('Error processing file');
+    }
   }
 }

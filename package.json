@@ -25,6 +25,8 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/serve-static": "^5.0.1",
+    "@types/xml-crypto": "^1.4.6",
+    "@xmldom/xmldom": "^0.9.7",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
@@ -41,7 +43,9 @@
     "serve-static": "^2.1.0",
     "sign-pdf-lib": "^2.0.3",
     "uuid": "^11.0.5",
-    "xml2js": "^0.6.2"
+    "xml-crypto": "^6.0.0",
+    "xml2js": "^0.6.2",
+    "xmldom": "^0.6.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

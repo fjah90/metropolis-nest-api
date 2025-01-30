@@ -8,15 +8,22 @@ import { PdfDigitalSigner, SignerSettings, SignDigitalParameters } from 'sign-pd
 import { PrinterService } from '../printer/printer.service';
 import { PDFDocument } from 'pdf-lib';
 import { BillStorageService } from '../bill-storage/bill-storage.service';
-
+import { SignedXml } from 'xml-crypto';
+import { DOMParser } from 'xmldom'
 @Injectable()
 export class PdfSigningService {
+  private readonly privateKey: Buffer;
 
   constructor(
     private readonly printerService: PrinterService,
     private readonly configService: ConfigService, // Para variables de entorno
     private readonly billStorageService: BillStorageService, // Para crear el archivo en base de datos
   ) {
+      const privateKeyPath = path.resolve(process.cwd(), '.ssh/private_decrypted.key');
+    if (!fse.existsSync(privateKeyPath)) {
+      throw new Error(`El archivo de clave privada no existe: ${privateKeyPath}`);
+       }
+       this.privateKey = fse.readFileSync(privateKeyPath);
   }
 
   private async prepareSigner(): Promise<PdfDigitalSigner> {
@@ -208,5 +215,42 @@ export class PdfSigningService {
       throw error;
     }
   }
+
+  //metodo para firmar el xml
+  async signXml(xml: string, invoiceNumber: string = ''): Promise<{ fileName: string, url: string }> {
+    const sig = new SignedXml({ privateKey: this.privateKey });
+
+    sig.addReference({
+      xpath: "//*[local-name(.)='Invoices']", // Ajusta según tu XML
+      digestAlgorithm: 'http://www.w3.org/2000/09/xmldsig#sha1',
+      transforms: ['http://www.w3.org/2001/10/xml-exc-c14n#'],
+    });
+
+    sig.canonicalizationAlgorithm = 'http://www.w3.org/2001/10/xml-exc-c14n#';
+    sig.signatureAlgorithm = 'http://www.w3.org/2000/09/xmldsig#rsa-sha1';
+
+    sig.computeSignature(xml);
+    const signedXml = sig.getSignedXml();
+
+    // Crear nombre y ruta del archivo
+    const timestamp = moment().format('DDMMYYYYHHmmss');
+    const fileName = `factura-N-${invoiceNumber}_${timestamp}.xml`;
+    const outputPath = path.resolve(process.cwd(), 'public/output/xml-files');
+    
+    if (!(await fse.pathExists(outputPath))) {
+      await fse.mkdirp(outputPath);
+    }
+
+    const filePath = path.resolve(outputPath, fileName);
+    await fse.writeFile(filePath, signedXml);
+
+    // Construir URL del archivo
+    const baseUrl = process.env.BASE_URL || 'http://localhost:3000/public';
+    const fileUrl = new URL(`/output/${fileName}`, baseUrl).toString();
+
+    return { fileName, url: fileUrl };
+}
+
+
 
 }
