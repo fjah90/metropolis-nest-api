@@ -42,20 +42,19 @@ export class BillController {
 
         try {
             const xmlData = file.buffer.toString();
-            
+
             // 1. Convierte el XML a JSON y genera el PDF
             const json = await this.billService.convertirXmlAJson(xmlData);
+
             const pdfDetails = await this.billService.generatePdfFromJson(json);  // Aquí se firma el PDF
 
-            // 2. Firma el XML
-            const xmlDetails = await this.pdfSigningService.signXml(xmlData, '123456');  // Firma del XML
 
             // Responde con los nombres y URLs de los archivos PDF y XML firmados
             return {
-                pdfFileName: pdfDetails.fileName,
-                pdfUrl: pdfDetails.url,
-                xmlFileName: xmlDetails.fileName,
-                xmlUrl: xmlDetails.url,
+                pdfFileName: pdfDetails.pdfFileName,
+                pdfUrl: pdfDetails.pdfUrl,
+                xmlFileName: pdfDetails.xmlFileName,
+                xmlUrl: pdfDetails.xmlUrl,
             };
         } catch (error) {
             console.error('Error processing file:', error);
@@ -67,15 +66,16 @@ export class BillController {
     @UseInterceptors(FileInterceptor('file'))
     @ApiBody({ type: 'form-data' })
     @ApiResponse({ status: 200, description: 'PDF y XML generado y firmado correctamente.' })
-    async firmarXml(@UploadedFile() file: Express.Multer.File): Promise<{ fileName: string; url: string }> {
+    async signXml(@UploadedFile() file: Express.Multer.File): Promise<{ xmlFileName: string, xmlUrl: string }> {
         if (!file) {
             throw new BadRequestException('No file uploaded');
         }
 
         try {
             const xmlData = file.buffer.toString();
-            const pdfDetails = await this.pdfSigningService.signXml(xmlData); // Llamada al método de firma
-            return pdfDetails;
+            const xmlDetails = await this.pdfSigningService.signXml(xmlData); // Llamada al método de firma
+
+            return xmlDetails;
         } catch (error) {
             console.error('Error processing file:', error);
             throw new InternalServerErrorException('Error processing file');

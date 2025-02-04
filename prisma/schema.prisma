@@ -15,8 +15,10 @@ datasource db {
 
 model bill {
   id    Int   @id @unique @default(autoincrement())
-  name  String  @unique
-  download_url  String
+  pdf_name  String  @unique
+  xml_name  String  @unique
+  pdf_url  String
+  xml_url  String
   is_deleted Boolean @default(false)
   created_at  DateTime   @default(now())
   update_at   DateTime  @updatedAt

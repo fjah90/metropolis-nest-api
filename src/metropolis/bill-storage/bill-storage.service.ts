@@ -36,7 +36,7 @@ export class BillStorageService {
     try {
       return this.prisma.bill.findUnique({
         where: {
-          name: filename,
+          pdf_name: filename,
         },
       });
     } catch (error) {
@@ -68,6 +68,7 @@ export class BillStorageService {
   async deleteBillById(id: number): Promise<{ message: string }> {
     try {
       const isDelete = await this.deleteBillOutput(id); // TODO: cambiar por el metodo para ser borrado del servidor externo
+
       if (isDelete) {
         await this.prisma.bill.delete({
           where: { id },
@@ -87,11 +88,13 @@ export class BillStorageService {
       const file = await this.prisma.bill.findFirstOrThrow({
         where: { id },
       });
-      const fullPath = path.resolve(process.cwd(), 'public', 'output', `${file.name}`);
+      const fullPathPDF = path.resolve(process.cwd(), 'public', 'output', `${file.pdf_name}`);
+      const fullPathXML = path.resolve(process.cwd(), 'public', 'output', `${file.xml_name}`);
       if (!fse.existsSync) {
-        throw new NotFoundException(`Factura con ID "${id}" no encontrada.`);
+        throw new NotFoundException(`Factura con ID ${id} y nombre de archivo ${file.pdf_name} no encontrado.`);
       } else {
-        await fse.unlink(fullPath);
+        await fse.unlink(fullPathPDF);
+        await fse.unlink(fullPathXML);
       }
 
       return true;

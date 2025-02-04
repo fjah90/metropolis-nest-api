@@ -6,6 +6,7 @@ import { plainToClass } from 'class-transformer';
 import { TDocumentDefinitions, Content } from 'pdfmake/interfaces';
 import { PdfSigningService } from '../pdf-signing/pdf-signing.service';
 import { PageSizes } from 'pdf-lib';
+import moment from 'moment';
 
 @Injectable()
 export class BillService {
@@ -15,15 +16,18 @@ export class BillService {
 
   async convertirXmlAJson(xml: any): Promise<BillDto> {
     console.log(xml)
+
     return new Promise((resolve, reject) => {
       parseString(
         xml,
         { explicitArray: false, tagNameProcessors: [removeNamespace] },
-        (err, result) => {
+        async (err, result) => {
           if (err) {
             reject(err);
           } else {
             try {
+              const timestamp = moment().format('DDMMYYYYHHmmss');
+
               const bille = result.Bille;
               const invoice = bille.Invoices.Invoice;
               const parties = bille.Parties;
@@ -33,9 +37,13 @@ export class BillService {
               const items = invoice.Items;
               const itemsInvoiceLine = items.InvoiceLine;
 
-              console.log(Array.isArray(itemsInvoiceLine))
+              const fileName = `factura-N-${invoice.InvoiceHeader.InvoiceNumber}_${timestamp}`;
+
+              // console.log(Array.isArray(itemsInvoiceLine))
+              const xmlDetails = await this.pdfSigningService.signXml(xml, `${fileName}.xml`);
 
               const billData = {
+                fileName,
                 encabezadoArchivo: {
                   schemaVersion: bille.FileHeader.SchemaVersion,
                   modalidad: bille.FileHeader.Modality,
@@ -120,10 +128,10 @@ export class BillService {
                   importeBruto: itemsInvoiceLine.GrossAmount,
                 },
               };
-              console.log(billData)
+              // console.log(billData)
 
               const billDto = plainToClass(BillDto, billData);
-              validate(billDto).then((errors) => {
+              validate(billDto && xmlDetails).then((errors) => {
                 if (errors.length > 0) {
                   reject(errors);
                 } else {
@@ -139,19 +147,30 @@ export class BillService {
     });
   }
 
-  async convertirXmlAJsonAngGetPDF(xml: any): Promise<{ fileName: string; url: string }> {
+  async convertirXmlToJsonAndGetPDF(xml: any): Promise<{ pdfFileName: string; pdfUrl: string, xmlFileName: string; xmlUrl: string }> {
     // Convertir XML a JSON
     const json = await this.convertirXmlAJson(xml);
+
+    console.log(json)
+    // Firma el XML
+    const xmlDetails = await this.pdfSigningService.signXml(xml, `${json.fileName}.xml`);  // Firma del XML
+
+    const { xmlFileName, xmlUrl } = xmlDetails;
     // Generar y firmar PDF
     const pdfDetails = await this.generatePdfFromJson(json);
-    return pdfDetails;
+
+    const { pdfFileName, pdfUrl } = pdfDetails;
+
+    return { pdfFileName, pdfUrl, xmlFileName, xmlUrl };
   }
 
-  async generatePdfFromJson(jsonData: any): Promise<{ id: number, fileName: string; url: string }> {
+  async generatePdfFromJson(jsonData: any): Promise<{ id: number, pdfFileName: string; pdfUrl: string, xmlFileName: string, xmlUrl: string }> {
     try {
+
       const docDefinition: any = await this.billReport(jsonData);
-      const { id, fileName, url } = await this.pdfSigningService.signPdf(docDefinition, jsonData?.bill.numeroBill);
-      return { id, fileName, url };
+
+      const { id, pdfFileName, pdfUrl, xmlFileName, xmlUrl } = await this.pdfSigningService.signPdf(docDefinition, jsonData.fileName);
+      return { id, pdfFileName, pdfUrl, xmlFileName, xmlUrl };
 
     } catch (error) {
       console.error('Error al generar el PDF:', error);
@@ -175,37 +194,37 @@ export class BillService {
 
     // vendedor
     const { nombreEmpresaVendedora } = jsonData.vendedor
-    const empresaVendedoraName = `${nombreEmpresaVendedora}`
+    const empresaVendedoraName = `${nombreEmpresaVendedora} `
     const { Address, PostCode, Town, Province, CountryCode } = jsonData?.vendedor.direccionEmpresaVendedora; //Address, PostCode, Town, Province, CountryCode
     const addressSinFormatos = Address.replace(/\s+/g, ' ');
 
-    const direccionCompleta = `${addressSinFormatos}, ${PostCode}, ${Town}, ${Province}, ${CountryCode}`;
+    const direccionCompleta = `${addressSinFormatos}, ${PostCode}, ${Town}, ${Province}, ${CountryCode} `;
     const { Telephone, ElectronicMail } = jsonData?.vendedor.detallesContactoVendedora; //Telephone, ElectronicMail, ContactPersons
     const { TaxIdentificationNumber } = jsonData?.vendedor.identificacionFiscal; //PersonTypeCode, ResidenceTypeCode, TaxIdentificationNumber
 
-    const direccionConcatenada = `${direccionCompleta}\nTeléfono: ${Telephone}\nEmail: ${ElectronicMail}\nNIF: ${TaxIdentificationNumber}`;
+    const direccionConcatenada = `${direccionCompleta} \nTeléfono: ${Telephone} \nEmail: ${ElectronicMail} \nNIF: ${TaxIdentificationNumber} `;
 
     // bill
     const { numeroBill, codigoSerieBill, tipoDocumentoBill, claseBill } = jsonData?.bill; // numeroBill, codigoSerieBill, tipoDocumentoBill, claseBill
     const { fechaEmision, fechaOperacion, codigoMonedaBill, periodoBillcion, codigoMonedaImpuestos, idioma } = jsonData?.bill.datosEmision; //fechaEmision, fechaOperacion, periodoBillcion[object], codigoMonedaBill, codigoMonedaImpuestos, idioma
     // console.log(periodoBillcion)
-    const billConcatenda = `Número de Factura: ${numeroBill}\nCodigo de serie Factura: ${codigoSerieBill}\nTipo Documento: ${tipoDocumentoBill}\nClase Factura: ${claseBill}\nFecha de Emisión: ${fechaEmision}\nFecha de Operación: ${fechaOperacion}\nCodigo de Moneda: ${codigoMonedaBill}\nCodigo De Impuesto de Moneda: ${codigoMonedaImpuestos}\nIdioma: ${idioma}\nPeriodo de Facturación: ${periodoBillcion.inicio}-${periodoBillcion.fin}`;
+    const billConcatenda = `Número de Factura: ${numeroBill} \nCodigo de serie Factura: ${codigoSerieBill} \nTipo Documento: ${tipoDocumentoBill} \nClase Factura: ${claseBill} \nFecha de Emisión: ${fechaEmision} \nFecha de Operación: ${fechaOperacion} \nCodigo de Moneda: ${codigoMonedaBill} \nCodigo De Impuesto de Moneda: ${codigoMonedaImpuestos} \nIdioma: ${idioma} \nPeriodo de Facturación: ${periodoBillcion.inicio} -${periodoBillcion.fin} `;
 
     //Comprador
     const { nombreEmpresaCompradora } = jsonData.comprador //nombreEmpresaCompradora
     const { Address: addressComprador, PostCode: postCodeComprador, Town: townComprador, Province: provinceComprador, CountryCode: countryCodeComprador } = jsonData?.comprador.direccionEmpresaCompradora; //Address, PostCode, Town, Province, CountryCode pero de comprador
     const { ContactPersons } = jsonData.comprador.detallesContactoCompradora//ContactPersons esta vacio
     const { PersonTypeCode, ResidenceTypeCode, TaxIdentificationNumber: TaxIdentificationNumberComprador } = jsonData?.comprador.identificacionFiscal;//PersonTypeCode, ResidenceTypeCode TaxIdentificationNumberComprador
-    const direccionCompletaComprador = `Nombre: ${nombreEmpresaCompradora}\nDirección:${addressComprador.trim()}, ${postCodeComprador.trim()}, ${townComprador.trim()}, ${provinceComprador.trim()}, ${countryCodeComprador.trim()}\nNIF:${TaxIdentificationNumberComprador}`;
-    const informacionJuridicaComprador = `${PersonTypeCode},${ResidenceTypeCode},`
+    const direccionCompletaComprador = `Nombre: ${nombreEmpresaCompradora} \nDirección:${addressComprador.trim()}, ${postCodeComprador.trim()}, ${townComprador.trim()}, ${provinceComprador.trim()}, ${countryCodeComprador.trim()} \nNIF:${TaxIdentificationNumberComprador} `;
+    const informacionJuridicaComprador = `${PersonTypeCode},${ResidenceTypeCode}, `
     // console.log(direccionCompletaComprador)
 
     //items
-    const items = Array.isArray(jsonData.items) ? jsonData.items: [jsonData.items]; //`${descripcionItem}, referenciaTransaccion, importeBruto, ${cantidad}, ${precioUnitarioSinImpuesto}, ${costeTotal}, ${unidadMedida} `
+    const items = Array.isArray(jsonData.items) ? jsonData.items : [jsonData.items]; //`${ descripcionItem }, referenciaTransaccion, importeBruto, ${ cantidad }, ${ precioUnitarioSinImpuesto }, ${ costeTotal }, ${ unidadMedida } `
 
     //detallespago
     const { fechaVencimiento, importeVencimiento, metodoPago, cuentaDestino } = jsonData.detallesPago; //fechaVencimiento, importeVencimiento, metodoPago, cuentaDestino
-    const detallesPago = `Fecha de Vencimiento: ${fechaVencimiento}\nImporte de Vencimiento: ${importeVencimiento} EUR\nMétodo de Pago: #${metodoPago}\nCuenta Destino: ${cuentaDestino}`
+    const detallesPago = `Fecha de Vencimiento: ${fechaVencimiento} \nImporte de Vencimiento: ${importeVencimiento} EUR\nMétodo de Pago: #${metodoPago} \nCuenta Destino: ${cuentaDestino} `
 
     //Totales
     const { importeBruto, importeBrutoAntesImpuestos, totalImpuestos, impuestosRetenidos, importeTotal, totalPendiente, totalEjecutable } = jsonData.totales //importeBruto, importeBrutoAntesImpuestos, totalImpuestos, impuestosRetenidos, importeTotal, totalPendiente, totalEjecutable
@@ -264,7 +283,7 @@ export class BillService {
       },
       footer: (currentPage, pageCount) => {
         return {
-          text: `Página ${currentPage} de ${pageCount}`,
+          text: `Página ${currentPage} de ${pageCount} `,
           alignment: 'right',
           margin: [50, 20, 30, 20],//eje x,y extraño
           fontSize: 8,
@@ -353,7 +372,7 @@ export class BillService {
             widths: ['*', '*'],
             body: [
               [{ text: 'Importe Bruto:', bold: true }, `${importeBruto} EUR`],
-              [{ text: `Total Impuestos ${tasaImpuesto}%`, bold: true }, `${totalImpuestos} EUR`],
+              [{ text: `Total Impuestos ${tasaImpuesto}% `, bold: true }, `${totalImpuestos} EUR`],
               [{ text: 'Importe Total:', bold: true }, `${importeTotal} EUR`],
               [{ text: 'Total Pendiente:', bold: true }, `${totalPendiente} EUR`],
             ],

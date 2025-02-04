@@ -20,7 +20,7 @@ export class PdfSigningController {
     };
 
     // Firmamos el PDF
-    const signedPdfBuffer = await this.pdfSigningService.signPdf(docDefinition);
+    const signedPdfBuffer = await this.pdfSigningService.signPdf(docDefinition, 'Signed-Pdf.pdf');
 
     // Retornamos el PDF firmado como base64
     response.setHeader('Content-Type', 'application/pdf');
@@ -49,8 +49,8 @@ export class PdfSigningController {
       const signedXml = await this.pdfSigningService.signXml(xmlData);
 
       return {
-        fileName: signedXml.fileName,
-        url: signedXml.url,
+        fileName: signedXml.xmlFileName,
+        url: signedXml.xmlUrl,
       };
     } catch (error) {
       console.error('Error processing file:', error);

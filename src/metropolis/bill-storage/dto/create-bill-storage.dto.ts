@@ -3,11 +3,19 @@ import { IsBoolean, IsNotEmpty, IsString, IsUrl } from 'class-validator';
 export class CreateBillStorageDto {
   @IsString()
   @IsNotEmpty()
-  name: string;
+  pdf_name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  xml_name: string;
 
   @IsUrl()
   @IsNotEmpty()
-  download_url: string;
+  pdf_url: string;
+
+  @IsUrl()
+  @IsNotEmpty()
+  xml_url: string;
 
   @IsBoolean()
   @IsNotEmpty()

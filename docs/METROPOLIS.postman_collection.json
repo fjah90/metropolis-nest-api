@@ -86,7 +86,7 @@
 					"name": "bill",
 					"item": [
 						{
-							"name": "api/v1/bill/create-and-sign-pdf",
+							"name": "api/v1/bill/create-and-sign-pdf-and-xml",
 							"request": {
 								"auth": {
 									"type": "bearer",
@@ -106,12 +106,12 @@
 										{
 											"key": "file",
 											"type": "file",
-											"src": "/C:/Users/ferna/Downloads/FRA_MET_10200.xml"
+											"src": "/C:/Users/ferna/Downloads/FRA_MET_10200-(4 items).xml"
 										}
 									]
 								},
 								"url": {
-									"raw": "http://localhost:3000/api/v1/bill/create-and-sign-pdf",
+									"raw": "http://localhost:3000/api/v1/bill/create-and-sign-pdf-and-xml",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -121,7 +121,7 @@
 										"api",
 										"v1",
 										"bill",
-										"create-and-sign-pdf"
+										"create-and-sign-pdf-and-xml"
 									]
 								}
 							},
@@ -129,6 +129,48 @@
 						},
 						{
 							"name": "api/v1/bill/conver-to-json",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiam9obiIsImlhdCI6MTczNjk2MDUyOCwiZXhwIjoxNzM2OTY0MTI4fQ.3QG-OkTWyX4kO2Y9YCF5xnpjv7dzQ_x9VVrSstPE4SI",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/ferna/Downloads/FRA_MET_10200-(4 items).xml"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:3000/api/v1/bill/conver-to-json",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"v1",
+										"bill",
+										"conver-to-json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "api/v1/bill/create-and-sign-xml",
 							"request": {
 								"auth": {
 									"type": "bearer",

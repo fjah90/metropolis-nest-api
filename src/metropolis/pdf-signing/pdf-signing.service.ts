@@ -9,7 +9,6 @@ import { PrinterService } from '../printer/printer.service';
 import { PDFDocument } from 'pdf-lib';
 import { BillStorageService } from '../bill-storage/bill-storage.service';
 import { SignedXml } from 'xml-crypto';
-import { DOMParser } from 'xmldom'
 @Injectable()
 export class PdfSigningService {
   private readonly privateKey: Buffer;
@@ -19,11 +18,11 @@ export class PdfSigningService {
     private readonly configService: ConfigService, // Para variables de entorno
     private readonly billStorageService: BillStorageService, // Para crear el archivo en base de datos
   ) {
-      const privateKeyPath = path.resolve(process.cwd(), '.ssh/private_decrypted.key');
+    const privateKeyPath = path.resolve(process.cwd(), '.ssh/private_decrypted.key');
     if (!fse.existsSync(privateKeyPath)) {
       throw new Error(`El archivo de clave privada no existe: ${privateKeyPath}`);
-       }
-       this.privateKey = fse.readFileSync(privateKeyPath);
+    }
+    this.privateKey = fse.readFileSync(privateKeyPath);
   }
 
   private async prepareSigner(): Promise<PdfDigitalSigner> {
@@ -115,9 +114,9 @@ export class PdfSigningService {
     };
   }
 
-  async signPdf(docDefinition: TDocumentDefinitions, invoiceNumber: any = ""): Promise<{ id: number, fileName: string, url: string }> {
-    const timestamp = moment().format('DDMMYYYYHHmmss');
-    const uniqueFilename = `factura-N-${invoiceNumber}_${timestamp}.pdf`;
+  async signPdf(docDefinition: TDocumentDefinitions, pdfName: string): Promise<{ id: number, pdfFileName: string, pdfUrl: string, xmlFileName: string, xmlUrl: string }> {
+    const uniqueFilename = pdfName + '.pdf';
+    const xmlFilename = pdfName + '.xml';
 
     const outputPath = path.resolve(process.cwd(), 'public/output');
     if (!(await fse.pathExists(outputPath))) {
@@ -167,12 +166,14 @@ export class PdfSigningService {
     // TODO: se debe construir la url del archivo en el servidor de almacenamiento en la nube
     // TODO: confirmar que el archivo este subido a la nube
     const fullUrl = new URL(relativeUrl, baseUrl).toString(); //baseUrl por url del archivo en el servidor
+    const xmlUrl = new URL(`/public/output/${xmlFilename}`, baseUrl).toString();
+
     try {
-      const data = await this.registerPdfInDatabase(signedPdfFilename, fullUrl);
+      const data = await this.registerPdfAndXMLInDatabase(signedPdfFilename, fullUrl, xmlFilename, xmlUrl);
       if (!data) {
         throw new Error('Error al registrar el PDF en la base de datos');
       }
-      return { id: data.id, fileName: signedPdfFilename, url: fullUrl };
+      return { id: data.id, pdfFileName: signedPdfFilename, pdfUrl: fullUrl, xmlFileName: xmlFilename, xmlUrl: xmlUrl };
     } catch (error) {
       console.error('Error registrando el PDF en la base de datos:', error);
       throw error;
@@ -196,15 +197,17 @@ export class PdfSigningService {
   }
 
   //Metodo para Guardado en base de datos
-  private async registerPdfInDatabase(fileName: string, fullUrl: string,): Promise<any> {
+  private async registerPdfAndXMLInDatabase(PDFfileName: string, PDFfullUrl: string, XMLfileName: string, XMLfullUrl: string,): Promise<any> {
     try {
       // Crear el registro en la base de datos
       const data = await this.billStorageService.createBill({
-        name: fileName,
-        download_url: fullUrl,
+        pdf_name: PDFfileName,
+        xml_name: XMLfileName,
+        pdf_url: PDFfullUrl,
+        xml_url: XMLfullUrl,
         is_deleted: false,
       });
-      if(!data){
+      if (!data) {
         throw new Error('Error al registrar el PDF en la base de datos');
       }
       console.log(data);
@@ -217,11 +220,10 @@ export class PdfSigningService {
   }
 
   //metodo para firmar el xml
-  async signXml(xml: string, invoiceNumber: string = ''): Promise<{ fileName: string, url: string }> {
+  async signXml(xml: string, xmlName: string = 'SignedXml.xml'): Promise<{ xmlFileName: string; xmlUrl: string }> {
     const sig = new SignedXml({ privateKey: this.privateKey });
-
     sig.addReference({
-      xpath: "//*[local-name(.)='Invoices']", // Ajusta según tu XML
+      xpath: "//*[local-name(.)='Invoices']", // Ajusta según XML
       digestAlgorithm: 'http://www.w3.org/2000/09/xmldsig#sha1',
       transforms: ['http://www.w3.org/2001/10/xml-exc-c14n#'],
     });
@@ -233,10 +235,9 @@ export class PdfSigningService {
     const signedXml = sig.getSignedXml();
 
     // Crear nombre y ruta del archivo
-    const timestamp = moment().format('DDMMYYYYHHmmss');
-    const fileName = `factura-N-${invoiceNumber}_${timestamp}.xml`;
-    const outputPath = path.resolve(process.cwd(), 'public/output/xml-files');
-    
+    const fileName = xmlName;
+    const outputPath = path.resolve(process.cwd(), 'public/output');
+
     if (!(await fse.pathExists(outputPath))) {
       await fse.mkdirp(outputPath);
     }
@@ -248,8 +249,8 @@ export class PdfSigningService {
     const baseUrl = process.env.BASE_URL || 'http://localhost:3000/public';
     const fileUrl = new URL(`/output/${fileName}`, baseUrl).toString();
 
-    return { fileName, url: fileUrl };
-}
+    return { xmlFileName: xmlName, xmlUrl: fileUrl };
+  }
 
 
 

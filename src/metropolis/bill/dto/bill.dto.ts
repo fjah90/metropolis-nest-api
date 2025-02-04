@@ -166,4 +166,6 @@ export class BillDto {
       };
     }[];
   };
+
+  fileName: string | null;
 }
