@@ -11,6 +11,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PdfSigningModule } from './metropolis/pdf-signing/pdf-signing.module';
 import { BillStorageModule } from './metropolis/bill-storage/bill-storage.module';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [
@@ -28,6 +29,8 @@ import { BillStorageModule } from './metropolis/bill-storage/bill-storage.module
     PdfSigningModule,
     BillModule,
     BillStorageModule,
+    PrismaModule
+    
   ],
   controllers: [AppController],
   providers: [AppService],

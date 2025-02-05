@@ -6,9 +6,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constans';
 import { AuthGuard } from './auth.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { PrismaModule } from '../../prisma/prisma.module';
 
 @Module({
-  imports: [UsersModule,
+  imports: [PrismaModule,UsersModule,
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,

@@ -23,3 +23,23 @@ model bill {
   created_at  DateTime   @default(now())
   update_at   DateTime  @updatedAt
 }
+
+model users {
+  id          Int   @id @unique @default(autoincrement())
+  username    String
+  email       String  @unique
+  password    String
+  is_deleted  Boolean @default(false)
+  rolId       Int 
+  rol         Rol @relation(fields: [rolId], references: [id])
+  created_at  DateTime   @default(now())
+  update_at   DateTime  @updatedAt
+}
+
+model Rol {
+  id          Int   @id @unique @default(autoincrement())
+  name        String  @unique
+  users       users[]
+  created_at  DateTime   @default(now())
+  update_at   DateTime  @updatedAt
+}

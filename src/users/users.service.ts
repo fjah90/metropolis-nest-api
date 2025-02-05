@@ -1,44 +1,93 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
-export type User = any;
+import * as bcrypt from 'bcrypt';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class UsersService {
+  constructor(private prisma: PrismaService) {}
 
-  private readonly users = [
-    {
-      userId: 1,
-      username: 'john',
-      password: 'changeme'
-    },
-    {
-      userId: 2,
-      username: 'maria',
-      password: 'guess'
+  // Método para crear un nuevo usuario
+  async create(createUserDto: CreateUserDto) {
+    const { username, email, password, rolNombre } = createUserDto;
+
+     // Validar que el rol sea "admin" o "usuario"
+     if (!['admin', 'usuario'].includes(rolNombre)) {
+      throw new BadRequestException('Rol no válido. Debe ser "admin" o "usuario".');
     }
-  ];
+    const existingUser = await this.prisma.users.findUnique({ where: { email } });
+    if (existingUser) {
+      throw new ConflictException('El email ya está registrado.');
+    }
 
-  async findOne(username: string): Promise<User | undefined> {
-    const user = this.users.find(user => user.username === username);
-    console.log('User found in findOne:', user); // Log para verificar si el usuario fue encontrado
-    return user;
+    // Encriptar la contraseña
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Buscar o crear el rol
+    let rol = await this.prisma.rol.findUnique({ where: { name: rolNombre } });
+    if (!rol) {
+      rol = await this.prisma.rol.create({ data: { name: rolNombre } });
+    }
+
+    // Crear el usuario en la base de datos
+    return this.prisma.users.create({
+      data: {
+        username,
+        email,
+        password: hashedPassword,
+        rolId: rol.id,
+      },
+    });
   }
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  // Método para obtener todos los usuarios
+  async findAll() {
+    return this.prisma.users.findMany({
+      where: { is_deleted: false }, // Solo usuarios no eliminados lógicamente
+      include: { rol: true }, // Incluir la relación con Rol
+    });
   }
 
-  findAll() {
-    return `This action returns all users`;
+  // Listar un usuario por ID
+  async findOne(id: number) {
+  const user = await this.prisma.users.findUnique({
+    where: { id },
+    include: { rol: true }, // Incluir la relación con Rol
+  });
+
+  if (!user) {
+    throw new NotFoundException('Usuario no encontrado');
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  return user;
+}
+
+  // Eliminar lógico (soft delete)
+  async softDelete(id: number) {
+    const user = await this.prisma.users.update({
+      where: { id },
+      data: { is_deleted: true }, // Marcar como eliminado lógicamente
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    return { message: 'Usuario eliminado lógicamente' };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  // Eliminar físico (eliminar de la base de datos)
+ // Eliminar físico (eliminar de la base de datos)
+async hardDelete(id: number) {
+  const user = await this.prisma.users.delete({
+    where: { id },
+  });
+
+  if (!user) {
+    throw new NotFoundException('Usuario no encontrado');
   }
+
+  return { message: 'Usuario eliminado físicamente' };
+}
 }

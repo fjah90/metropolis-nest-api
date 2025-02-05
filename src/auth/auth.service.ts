@@ -3,6 +3,7 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -12,45 +13,36 @@ export class AuthService {
     private jwtService: JwtService
   ) { }
 
-  async signIn(username: string, pass: string): Promise<{ access_token: string }> {
+  async signIn(email: string, password: string): Promise<{ access_token: string }> {
     console.log('signIn method called'); // Log para verificar que el método está siendo llamado
 
-    const user = await this.usersService.findOne(username);
+    // Buscar el usuario por email
+    const user = await this.usersService.findOne(Number(email));
     console.log('User found:', user); // Verificar si el usuario se encuentra correctamente
 
     if (!user) {
       console.log('User not found'); // Verificar si no encuentra el usuario
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Usuario no encontrado');
     }
 
-    if (user.password !== pass) {
+    // Comparar la contraseña ingresada con la almacenada (encriptada)
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
       console.log('Invalid password'); // Verificar si la contraseña no coincide
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Contraseña incorrecta');
     }
 
-    const payload = { sub: user.userId, username: user.username };
+    // Generar el payload del token JWT
+    const payload = { sub: user.id, username: user.username, email: user.email, role: user.rol.name };
     const access_token = await this.jwtService.signAsync(payload);
     console.log('Generated token:', access_token); // Verificar si el token se genera correctamente
-    return { access_token: await this.jwtService.signAsync(payload), };
+
+    return { access_token: await this.jwtService.signAsync(payload) };
   }
 
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
-  }
-
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  // Método para registrar un nuevo usuario
+  async signUp(createAuthDto: { username: string; email: string; password: string; rolNombre: string }) {
+    return this.usersService.create(createAuthDto);
   }
 }
+
