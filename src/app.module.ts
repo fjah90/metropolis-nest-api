@@ -12,6 +12,7 @@ import { join } from 'path';
 import { PdfSigningModule } from './metropolis/pdf-signing/pdf-signing.module';
 import { BillStorageModule } from './metropolis/bill-storage/bill-storage.module';
 import { PrismaModule } from '../prisma/prisma.module';
+import { RolModule } from './rol/rol.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { PrismaModule } from '../prisma/prisma.module';
     PdfSigningModule,
     BillModule,
     BillStorageModule,
-    PrismaModule
+    PrismaModule,
+    RolModule
     
   ],
   controllers: [AppController],

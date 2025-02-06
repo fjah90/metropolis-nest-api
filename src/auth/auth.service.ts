@@ -17,7 +17,7 @@ export class AuthService {
     console.log('signIn method called'); // Log para verificar que el método está siendo llamado
 
     // Buscar el usuario por email
-    const user = await this.usersService.findOne(Number(email));
+    const user = await this.usersService.findOne((email));
     console.log('User found:', user); // Verificar si el usuario se encuentra correctamente
 
     if (!user) {
@@ -41,7 +41,7 @@ export class AuthService {
   }
 
   // Método para registrar un nuevo usuario
-  async signUp(createAuthDto: { username: string; email: string; password: string; rolNombre: string }) {
+  async signUp(createAuthDto: { username: string; email: string; password: string; rolId: number }) {
     return this.usersService.create(createAuthDto);
   }
 }

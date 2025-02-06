@@ -1,4 +1,4 @@
-import { IsString, IsEmail, MinLength, IsNotEmpty, IsIn } from 'class-validator';
+import { IsString, IsEmail, MinLength, IsNotEmpty, IsIn, IsNumber, IsInt } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -15,8 +15,8 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'La contraseña no puede estar vacía' })
   readonly password: string;
 
-  @IsString()
-  @IsNotEmpty({ message: 'El rol no puede estar vacío' })
-  @IsIn(['admin', 'usuario'], { message: 'El rol debe ser "admin" o "usuario"' })
-  readonly rolNombre: string;
+  @IsInt({ message: 'Ingrese un rol correcto' })
+  // @IsNotEmpty({ message: 'El rol no puede estar vacío' })
+  @IsIn([1, 2], { message: 'El Rol Asignado no existe ' })
+  readonly rolId: number = 2;
 }
