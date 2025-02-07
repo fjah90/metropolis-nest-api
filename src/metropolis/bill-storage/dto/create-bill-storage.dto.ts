@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsString, IsUrl } from 'class-validator';
 
 export class CreateBillStorageDto {
   @IsString()
@@ -20,4 +20,7 @@ export class CreateBillStorageDto {
   @IsBoolean()
   @IsNotEmpty()
   is_deleted: boolean;
+
+  @IsNumber()
+  user_id: number;
 }

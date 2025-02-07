@@ -1,12 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards } from '@nestjs/common';
 import { BillStorageService } from './bill-storage.service';
 import { CreateBillStorageDto } from './dto/create-bill-storage.dto';
 import { UpdateBillStorageDto } from './dto/update-bill-storage.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @ApiBearerAuth()
 @ApiTags('bill-storage')
 @Controller('bill-storage')
+@UseGuards(AuthGuard)
 export class BillStorageController {
   constructor(private readonly billStorageService: BillStorageService) { }
 

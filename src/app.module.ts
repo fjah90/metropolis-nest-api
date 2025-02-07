@@ -5,14 +5,14 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { PrinterModule } from './metropolis/printer/printer.module';
-import { BillModule } from './metropolis/bill/bill.module';
+import { BillsModule } from './metropolis/bills/bills.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PdfSigningModule } from './metropolis/pdf-signing/pdf-signing.module';
 import { BillStorageModule } from './metropolis/bill-storage/bill-storage.module';
 import { PrismaModule } from '../prisma/prisma.module';
-import { RolModule } from './rol/rol.module';
+import { RolsModule } from './rols/rols.module';
 
 @Module({
   imports: [
@@ -28,11 +28,10 @@ import { RolModule } from './rol/rol.module';
     UsersModule,
     PrinterModule,
     PdfSigningModule,
-    BillModule,
+    BillsModule,
     BillStorageModule,
     PrismaModule,
-    RolModule
-    
+    RolsModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -11,7 +11,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 @Controller('auth')
 // @UseGuards(AuthGuard)
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @ApiBearerAuth()
   @Post('register')
@@ -25,8 +25,8 @@ export class AuthController {
   // @UseGuards(AuthGuard)
   signIn(@Body() signInDto: Record<string, any>) {
     console.log('Received login request:', signInDto);
-    const { email, password } = signInDto; // Asegúrate de usar 'email' en lugar de 'username'
-    return this.authService.signIn(email, password);                                                                                                    return this.authService.signIn(signInDto.username, signInDto.password);
+    const { username, password } = signInDto; // Asegúrate de usar 'username' en lugar de 'username'
+    return this.authService.signIn(username, password); return this.authService.signIn(signInDto.username, signInDto.password);
   }
   @ApiBearerAuth()
   // @Public()
@@ -37,4 +37,4 @@ export class AuthController {
   }
 
   // @Public()
- }
+}

@@ -10,18 +10,30 @@ export class BillStorageService {
   constructor(private readonly prisma: PrismaService) { }
 
   async createBill(data: CreateBillStorageDto) {
+    console.log('data:', data);
     try {
-      return this.prisma.bill.create({
-        data,
+      return this.prisma.bills.create({
+        data: {
+          pdf_name: data.pdf_name,
+          xml_name: data.xml_name,
+          pdf_url: data.pdf_url,
+          xml_url: data.xml_url,
+          is_deleted: false,
+          user: {
+            connect: {
+              id: data.user_id, // Asocia la factura al usuario autenticado
+            },
+          },
+        },
       });
     } catch (error) {
-      console.error('Error creando el registro de factura:', error);
+      console.error('Error creando registro de factura:', error);
     }
   }
 
   async getAllBillStorage() {
     try {
-      return this.prisma.bill.findMany({
+      return this.prisma.bills.findMany({
         where: {
           is_deleted: false,
         },
@@ -34,7 +46,7 @@ export class BillStorageService {
 
   async getBillStorageByFileName(filename: string) {
     try {
-      return this.prisma.bill.findUnique({
+      return this.prisma.bills.findUnique({
         where: {
           pdf_name: filename,
         },
@@ -46,7 +58,7 @@ export class BillStorageService {
 
   async softDeleteBill(id: number, data: UpdateBillStorageDto) {
     try {
-      const updatedBill = await this.prisma.bill.update({
+      const updatedBill = await this.prisma.bills.update({
         where: { id: id },
         data: {
           is_deleted: true,
@@ -70,7 +82,7 @@ export class BillStorageService {
       const isDelete = await this.deleteBillOutput(id); // TODO: cambiar por el metodo para ser borrado del servidor externo
 
       if (isDelete) {
-        await this.prisma.bill.delete({
+        await this.prisma.bills.delete({
           where: { id },
         });
         return { message: `Factura con ID ${id} eliminada permanentemente.` };
@@ -85,7 +97,7 @@ export class BillStorageService {
 
   async deleteBillOutput(id: number): Promise<boolean> {
     try {
-      const file = await this.prisma.bill.findFirstOrThrow({
+      const file = await this.prisma.bills.findFirstOrThrow({
         where: { id },
       });
       const fullPathPDF = path.resolve(process.cwd(), 'public', 'output', `${file.pdf_name}`);

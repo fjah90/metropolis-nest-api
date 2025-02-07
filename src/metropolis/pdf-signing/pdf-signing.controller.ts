@@ -1,13 +1,15 @@
-import { Controller, Post, Body, Res, InternalServerErrorException, BadRequestException, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Post, Body, Res, InternalServerErrorException, BadRequestException, UseInterceptors, UploadedFile, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { PdfSigningService } from './pdf-signing.service';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @ApiBearerAuth()
 @ApiTags('pdf-signing')
 @Controller('pdf-signing')
+@UseGuards(AuthGuard)
 export class PdfSigningController {
   constructor(private readonly pdfSigningService: PdfSigningService) { }
 

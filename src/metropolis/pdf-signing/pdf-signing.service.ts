@@ -114,7 +114,9 @@ export class PdfSigningService {
     };
   }
 
-  async signPdf(docDefinition: TDocumentDefinitions, pdfName: string): Promise<{ id: number, pdfFileName: string, pdfUrl: string, xmlFileName: string, xmlUrl: string }> {
+  async signPdf(docDefinition: TDocumentDefinitions, pdfName: string, userId?: number): Promise<{ id: number, pdfFileName: string, pdfUrl: string, xmlFileName: string, xmlUrl: string }> {
+    console.log("signPdf:", userId)
+
     const uniqueFilename = pdfName + '.pdf';
     const xmlFilename = pdfName + '.xml';
 
@@ -169,7 +171,7 @@ export class PdfSigningService {
     const xmlUrl = new URL(`/public/output/${xmlFilename}`, baseUrl).toString();
 
     try {
-      const data = await this.registerPdfAndXMLInDatabase(signedPdfFilename, fullUrl, xmlFilename, xmlUrl);
+      const data = await this.registerPdfAndXMLInDatabase(signedPdfFilename, fullUrl, xmlFilename, xmlUrl, userId);
       if (!data) {
         throw new Error('Error al registrar el PDF en la base de datos');
       }
@@ -197,10 +199,11 @@ export class PdfSigningService {
   }
 
   //Metodo para Guardado en base de datos
-  private async registerPdfAndXMLInDatabase(PDFfileName: string, PDFfullUrl: string, XMLfileName: string, XMLfullUrl: string,): Promise<any> {
+  private async registerPdfAndXMLInDatabase(PDFfileName: string, PDFfullUrl: string, XMLfileName: string, XMLfullUrl: string, userId: number): Promise<any> {
     try {
       // Crear el registro en la base de datos
       const data = await this.billStorageService.createBill({
+        user_id: userId,
         pdf_name: PDFfileName,
         xml_name: XMLfileName,
         pdf_url: PDFfullUrl,

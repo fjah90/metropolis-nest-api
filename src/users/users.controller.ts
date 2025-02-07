@@ -9,17 +9,17 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/auth.guard';
 
 @ApiBearerAuth()
-@UseGuards(AuthGuard)
+@ApiTags('users')
 @Controller('users')
+@UseGuards(AuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   // Listar todos los usuarios
-  // @ApiBearerAuth()
   @Get()
   async findAll() {
     return this.usersService.findAll();

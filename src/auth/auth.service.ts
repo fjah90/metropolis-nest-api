@@ -13,11 +13,11 @@ export class AuthService {
     private jwtService: JwtService
   ) { }
 
-  async signIn(email: string, password: string): Promise<{ access_token: string }> {
+  async signIn(username: string, password: string): Promise<{ access_token: string }> {
     console.log('signIn method called'); // Log para verificar que el método está siendo llamado
 
     // Buscar el usuario por email
-    const user = await this.usersService.findOne((email));
+    const user = await this.usersService.findOne((username));
     console.log('User found:', user); // Verificar si el usuario se encuentra correctamente
 
     if (!user) {
@@ -27,13 +27,14 @@ export class AuthService {
 
     // Comparar la contraseña ingresada con la almacenada (encriptada)
     const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log('Password valid:', isPasswordValid); // Verificar si la contraseña coincide
     if (!isPasswordValid) {
       console.log('Invalid password'); // Verificar si la contraseña no coincide
       throw new UnauthorizedException('Contraseña incorrecta');
     }
 
     // Generar el payload del token JWT
-    const payload = { sub: user.id, username: user.username, email: user.email, role: user.rol.name };
+    const payload = { sub: user.id, username: user.username, email: user.email, rol: user.rolId };
     const access_token = await this.jwtService.signAsync(payload);
     console.log('Generated token:', access_token); // Verificar si el token se genera correctamente
 

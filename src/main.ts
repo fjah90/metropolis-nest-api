@@ -10,8 +10,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('api/v1');
-   // Habilitar validación global
-   app.useGlobalPipes(
+  // Habilitar validación global
+  app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // Ignora propiedades no definidas en el DTO
       forbidNonWhitelisted: true, // Lanza un error si hay propiedades no permitidas
@@ -27,8 +27,6 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('api')
     .build();
-
-
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/swagger', app, documentFactory)
