@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,33 +10,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model bill {
-  id    Int   @id @unique @default(autoincrement())
-  pdf_name  String  @unique
-  xml_name  String  @unique
-  pdf_url  String
-  xml_url  String
-  is_deleted Boolean @default(false)
-  created_at  DateTime   @default(now())
-  update_at   DateTime  @updatedAt
+model bills {
+  id         Int      @id @unique @default(autoincrement())
+  pdf_name   String   @unique
+  xml_name   String   @unique
+  pdf_url    String
+  xml_url    String
+  is_deleted Boolean  @default(false)
+  created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
+
+  // Relación con el modelo users
+  userId     Int      // Clave foránea para relacionar con users
+  user       users    @relation(fields: [userId], references: [id]) // Define la relación
 }
 
 model users {
-  id          Int   @id @unique @default(autoincrement())
-  username    String
-  email       String  @unique
-  password    String
-  is_deleted  Boolean @default(false)
-  rolId       Int 
-  rol         Rol @relation(fields: [rolId], references: [id])
-  created_at  DateTime   @default(now())
-  update_at   DateTime  @updatedAt
+  id         Int      @id @unique @default(autoincrement())
+  username   String
+  email      String   @unique
+  password   String
+  is_deleted Boolean  @default(false)
+  rolId      Int
+  rol        Rols     @relation(fields: [rolId], references: [id])
+  created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
+
+  // Relación inversa: Un usuario puede tener muchas facturas
+  bills      bills[]  // Lista de facturas asociadas al usuario
 }
 
-model Rol {
-  id          Int   @id @unique @default(autoincrement())
-  name        String  @unique
-  users       users[]
-  created_at  DateTime   @default(now())
-  update_at   DateTime  @updatedAt
+model Rols {
+  id         Int      @id @unique @default(autoincrement())
+  name       String   @unique
+  users      users[]
+  created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
 }
