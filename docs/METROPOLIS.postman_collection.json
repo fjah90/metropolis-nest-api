@@ -7,6 +7,123 @@
 	},
 	"item": [
 		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "api/v1/auth/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"followRedirects": true,
+						"disableUrlEncoding": false,
+						"disableCookies": false
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "User-Agent",
+								"value": "insomnia/10.3.0"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"superadmin\",\n\t\"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/auth/login",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/v1/auth/register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"followRedirects": true,
+						"disableUrlEncoding": false,
+						"disableCookies": false
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "User-Agent",
+								"value": "insomnia/10.3.0"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"superadmin\",\n\t\"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/auth/login",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "metropolis",
 			"item": [
 				{
@@ -83,17 +200,17 @@
 					]
 				},
 				{
-					"name": "bill",
+					"name": "bills",
 					"item": [
 						{
-							"name": "api/v1/bill/create-and-sign-pdf-and-xml",
+							"name": "api/v1/bills/create-and-sign-pdf-and-xml",
 							"request": {
 								"auth": {
 									"type": "bearer",
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiam9obiIsImlhdCI6MTczNjk2MDUyOCwiZXhwIjoxNzM2OTY0MTI4fQ.3QG-OkTWyX4kO2Y9YCF5xnpjv7dzQ_x9VVrSstPE4SI",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoic3VwZXJhZG1pbiIsImVtYWlsIjoiYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlIjoxLCJpYXQiOjE3Mzg4ODg5MTUsImV4cCI6MTczODg5MjUxNX0.hv4rmHOTAiau2qRyoWPeuPzchlOiUWjHDOPBJRh0RvQ",
 											"type": "string"
 										}
 									]
@@ -106,12 +223,12 @@
 										{
 											"key": "file",
 											"type": "file",
-											"src": "/C:/Users/ferna/Downloads/FRA_MET_10200-(4 items).xml"
+											"src": "/C:/Users/ferna/Downloads/FRA_MET_10200(4-InvoiceLine).xml"
 										}
 									]
 								},
 								"url": {
-									"raw": "http://localhost:3000/api/v1/bill/create-and-sign-pdf-and-xml",
+									"raw": "http://localhost:3000/api/v1/bills/create-and-sign-pdf-and-xml",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -120,7 +237,7 @@
 									"path": [
 										"api",
 										"v1",
-										"bill",
+										"bills",
 										"create-and-sign-pdf-and-xml"
 									]
 								}
@@ -128,7 +245,7 @@
 							"response": []
 						},
 						{
-							"name": "api/v1/bill/conver-to-json",
+							"name": "api/v1/bills/conver-to-json",
 							"request": {
 								"auth": {
 									"type": "bearer",
@@ -153,7 +270,7 @@
 									]
 								},
 								"url": {
-									"raw": "http://localhost:3000/api/v1/bill/conver-to-json",
+									"raw": "http://localhost:3000/api/v1/bills/conver-to-json",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -162,7 +279,7 @@
 									"path": [
 										"api",
 										"v1",
-										"bill",
+										"bills",
 										"conver-to-json"
 									]
 								}
@@ -170,14 +287,14 @@
 							"response": []
 						},
 						{
-							"name": "api/v1/bill/create-and-sign-xml",
+							"name": "api/v1/bills/create-and-sign-xml",
 							"request": {
 								"auth": {
 									"type": "bearer",
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiam9obiIsImlhdCI6MTczNjk2MDUyOCwiZXhwIjoxNzM2OTY0MTI4fQ.3QG-OkTWyX4kO2Y9YCF5xnpjv7dzQ_x9VVrSstPE4SI",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoic3VwZXJhZG1pbiIsImVtYWlsIjoiYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlIjoxLCJpYXQiOjE3Mzg4ODg5MTUsImV4cCI6MTczODg5MjUxNX0.hv4rmHOTAiau2qRyoWPeuPzchlOiUWjHDOPBJRh0RvQ",
 											"type": "string"
 										}
 									]
@@ -190,12 +307,12 @@
 										{
 											"key": "file",
 											"type": "file",
-											"src": "/C:/Users/ferna/Downloads/FRA_MET_10200-(4 items).xml"
+											"src": "/C:/Users/ferna/Downloads/FRA_MET_10200(20-InvoiceLine).xml"
 										}
 									]
 								},
 								"url": {
-									"raw": "http://localhost:3000/api/v1/bill/conver-to-json",
+									"raw": "http://localhost:3000/api/v1/bills/create-and-sign-xml",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -204,8 +321,8 @@
 									"path": [
 										"api",
 										"v1",
-										"bill",
-										"conver-to-json"
+										"bills",
+										"create-and-sign-xml"
 									]
 								}
 							},
@@ -346,50 +463,21 @@
 			]
 		},
 		{
-			"name": "auth",
+			"name": "users",
 			"item": [
 				{
-					"name": "api/v1/auth/login",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"followRedirects": true,
-						"disableUrlEncoding": false,
-						"disableCookies": false
-					},
+					"name": "api/v1/users",
 					"request": {
-						"method": "POST",
+						"method": "GET",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "User-Agent",
-								"value": "insomnia/10.3.0"
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"username\": \"john\",\n\t\"password\": \"changeme\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "localhost:3000/api/v1/auth/login",
+							"raw": "localhost:3000/api/v1/auth/users",
 							"host": [
 								"localhost"
 							],
@@ -398,7 +486,281 @@
 								"api",
 								"v1",
 								"auth",
-								"login"
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/v1/users/:id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:3000/api/v1/users/1",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/v1/users/:id/soft-delete",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:3000/api/v1/auth/users/:id/soft-delete",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"users",
+								":id",
+								"soft-delete"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "ID del usuario a eliminar lógicamente"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/v1/users/:id/hard-delete",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:3000/api/v1/users/:id/hard-delete",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								":id",
+								"hard-delete"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "ID del usuario a eliminar físicamente"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "rols",
+			"item": [
+				{
+					"name": "api/v1/rols",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/rols",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"rols"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/v1/rols/:id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoic3VwZXJhZG1pbiIsImVtYWlsIjoiYWRtaW5AZXhhbXBsZS5jb20iLCJyb2wiOjEsImlhdCI6MTczODg5Mjg3NCwiZXhwIjoxNzM4ODk2NDc0fQ.xlKDDt30TNvhM9zIjLJse31nkFKEk1hJbYkUBxZCExQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:3000/api/v1/rols/1",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"rols",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/v1/rols",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Nuevo Rol\"\n}"
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/rols",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"rols"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/v1/rols/:id",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:3000/api/v1/rols/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"rols",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "ID del rol a eliminar"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/v1/rols/:userId",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"rolId\": 2\n}"
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/rols/:userId",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"rols",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": ""
+								}
 							]
 						}
 					},
