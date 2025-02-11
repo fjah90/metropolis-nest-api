@@ -120,7 +120,7 @@ export class PdfSigningService {
     const uniqueFilename = pdfName + '.pdf';
     const xmlFilename = pdfName + '.xml';
 
-    const outputPath = path.resolve(process.cwd(), 'public/output');
+    const outputPath = path.resolve(process.cwd(), 'dist/public/output');
     if (!(await fse.pathExists(outputPath))) {
       await fse.mkdirp(outputPath);
     }
@@ -239,7 +239,7 @@ export class PdfSigningService {
 
     // Crear nombre y ruta del archivo
     const fileName = xmlName;
-    const outputPath = path.resolve(process.cwd(), 'public/output');
+    const outputPath = path.resolve(process.cwd(), 'dist/public/output');
 
     if (!(await fse.pathExists(outputPath))) {
       await fse.mkdirp(outputPath);
