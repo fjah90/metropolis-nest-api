@@ -175,13 +175,26 @@ export class PdfSigningService {
       if (!data) {
         throw new Error('Error al registrar el PDF en la base de datos');
       }
+  
+      // Definir rutas para el respaldo
+      const outputPathBk = path.resolve(process.cwd(), 'public/output'); // Ruta de backup
+      const fullPathPDF = path.resolve(outputPath, uniqueFilename); // Ruta del PDF original
+      const fullPathXML = path.resolve(outputPath, xmlFilename); // Ruta del XML original
+      const fullPathBkPDF = path.resolve(outputPathBk, uniqueFilename); // Ruta del PDF en el backup
+      const fullPathBkXML = path.resolve(outputPathBk, xmlFilename); // Ruta del XML en el backup
+  
+      // Copiar archivos al directorio de respaldo
+      await fse.copy(fullPathPDF, fullPathBkPDF);
+      console.log(`PDF respaldado: ${fullPathBkPDF}`);
+  
+      await fse.copy(fullPathXML, fullPathBkXML);
+      console.log(`XML respaldado: ${fullPathBkXML}`);
+  
       return { id: data.id, pdfFileName: signedPdfFilename, pdfUrl: fullUrl, xmlFileName: xmlFilename, xmlUrl: xmlUrl };
     } catch (error) {
       console.error('Error registrando el PDF en la base de datos:', error);
       throw error;
     }
-    // TODO: borrar el archivo del output
-    // await fse.unlink(fullPath);
   }
 
   private async addEmptyAcroForm(pdf: Buffer): Promise<Buffer> {
